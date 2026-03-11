@@ -31,7 +31,8 @@ def lex(input):
 
 
 def main():
-    if len(sys.argv) < 1:
+    if len(sys.argv) < 2:
+        print("usage: python lex.py <filepath>")
         sys.exit(1)
     file_path = sys.argv[1]
 
