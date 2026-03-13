@@ -39,8 +39,9 @@ def main():
     try:
         with open(file_path, "r") as file:
             source = file.read()
-
-        lex(source)
+            tokens = lex(source)
+            for token in tokens:
+                print(token)
     except FileNotFoundError:
         print(f"file '{file_path}' not found")
     except Exception as e:
@@ -49,14 +50,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-source = """
-print("hello")
-x = 10 + 20
-"""
-
-tokens = lex(source)
-
-for token in tokens:
-    print(token)
