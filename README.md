@@ -1,4 +1,4 @@
-#c but more functional
+# c but more functional
 
 no-c is a programming language centered around the idea of having no global namespace and more functional approach to syntax.
 
