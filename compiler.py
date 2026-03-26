@@ -10,6 +10,9 @@ from parser import (
     FloatLiteral,
     StringLiteral,
     Identifier,
+    FunctionDeclaration,
+    ReturnStatement,
+    CallExpression,
 )
 
 
@@ -44,6 +47,16 @@ class Compiler:
                 .replace("DIV", "/")
             )
             return f"({left} {op} {right})"
+        elif isinstance(node, FunctionDeclaration):
+            params = ", ".join(param.name for param in node.params)
+            bodylines = [self.compile_node(statement) for statement in node.body]
+            body = "\n".join("\t" + line for line in bodylines)
+            return f"def {node.name.name}({params}):\n{body}"
+        elif isinstance(node, ReturnStatement):
+            return f"return {self.compile_node(node.value)}"
+        elif isinstance(node, CallExpression):
+            args = ", ".join(self.compile_node(arg) for arg in node.args)
+            return f"{node.callee.name}({args})"
         elif isinstance(node, IntegerLiteral):
             return str(node.value)
         elif isinstance(node, FloatLiteral):

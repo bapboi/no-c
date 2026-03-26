@@ -13,6 +13,10 @@ from lexer import (
     TT_DIV,
     TT_LPAREN,
     TT_RPAREN,
+    TT_LBRACE,
+    TT_RBRACE,
+    TT_SEMI,
+    TT_COMMA,
     TT_EQ,
     TT_EOF,
 )
@@ -22,7 +26,7 @@ class Node:
     def to_tree(self, indent=0):
         spaces = "  " * indent
         result = f"{spaces}{self.__class__.__name__}"
-        for value in self.__dict__.items():
+        for value in self.__dict__.values():
             if isinstance(value, Node):
                 result += "\n" + value.to_tree(indent + 1)
             elif isinstance(value, list):
@@ -40,6 +44,9 @@ class Node:
 class Program(Node):
     def __init__(self, statements):
         self.statements = statements
+
+    def node_label(self):
+        return "Program"
 
 
 class AssignmentStatement(Node):
@@ -65,9 +72,18 @@ class BinaryExpression(Node):
         self.right = right
 
 
+class CallExpression(Node):
+    def __init__(self, callee, args):
+        self.callee = callee
+        self.args = args
+
+
 class IntegerLiteral(Node):
     def __init__(self, value):
         self.value = value
+
+    def node_label(self):
+        return f"IntegerLiteral({self.value})"
 
 
 class FloatLiteral(Node):
@@ -91,10 +107,16 @@ class FunctionDeclaration(Node):
         self.params = params
         self.body = body
 
+    def node_label(self):
+        return f"FunctionDeclaration({self.name.name})"
+
 
 class ReturnStatement(Node):
     def __init__(self, value):
         self.value = value
+
+    def node_label(self):
+        return f"ReturnStatement"
 
 
 class ConditionalStatement(Node):
@@ -102,6 +124,11 @@ class ConditionalStatement(Node):
         self.condition = condition
         self.then_body = then_body
         self.else_body = else_body
+
+
+class BlockStatement(Node):
+    def __init__(self, statements):
+        self.statements = statements
 
 
 class Parser:
@@ -119,15 +146,19 @@ class Parser:
             return self.tokens[self.pos + 1]
         return None
 
-    def eat(self, ttype):
+    def eat(self, type_):
         token = self.current()
         if token is None:
-            raise Exception(f"Unexpected EOF, expected {ttype}")
-        if token.type == ttype:
+            raise Exception(f"Unexpected EOF, expected {type_}")
+        if token.type == type_:
             self.pos += 1
             return token
         else:
-            raise Exception(f"Expected token {ttype}, got {token}")
+            raise Exception(f"Expected token {type_}, got {token.type}")
+
+    def semiHelper(self):
+        if self.current().type == TT_SEMI:
+            self.eat(TT_SEMI)
 
     def parse(self):
         statements = []
@@ -172,7 +203,41 @@ class Parser:
         self.eat(TT_LPAREN)
         expr = self.parse_expression()
         self.eat(TT_RPAREN)
+        self.semiHelper()
         return PrintStatement(expr)
+
+    def parse_return(self):
+        self.eat(TT_KEYWORD)
+        expr = self.parse_expression()
+        self.semiHelper()
+        return ReturnStatement(expr)
+
+    def parse_function(self):
+        self.eat(TT_KEYWORD)
+        name = self.eat(TT_IDENTIFIER)
+        name = Identifier(name.value)
+        self.eat(TT_LPAREN)
+        params = []
+        if self.current().type != TT_RPAREN:
+            val = self.eat(TT_IDENTIFIER)
+            params.append(Identifier(val.value))
+            while self.current().type == TT_COMMA:
+                self.eat(TT_COMMA)
+                val = self.eat(TT_IDENTIFIER)
+                params.append(Identifier(val.value))
+        self.eat(TT_RPAREN)
+        body = self.parse_block()
+        return FunctionDeclaration(name, params, body.statements)
+
+    def parse_block(self):
+        self.eat(TT_LBRACE)
+        statements = []
+        while self.current() and self.current().type != TT_RBRACE:
+            if self.current().type == TT_EOF:
+                raise Exception("Unexpected EOF: missing }")
+            statements.append(self.parse_statement())
+        self.eat(TT_RBRACE)
+        return BlockStatement(statements)
 
     def parse_expression(self):
         left = self.parse_term()
@@ -201,7 +266,10 @@ class Parser:
             return StringLiteral(token.value)
         elif token.type == TT_IDENTIFIER:
             self.eat(TT_IDENTIFIER)
-            return Identifier(token.value)
+            identifier = Identifier(token.value)
+            if self.current() and self.current().type == TT_LPAREN:
+                return self.callfinish(identifier)
+            return identifier
         elif token.type == TT_LPAREN:
             self.eat(TT_LPAREN)
             expr = self.parse_expression()
@@ -210,10 +278,21 @@ class Parser:
         else:
             raise Exception(f"Unexpected token {token.type}")
 
+    def callfinish(self, callee):
+        self.eat(TT_LPAREN)
+        args = []
+        if self.current().type != TT_RPAREN:
+            args.append(self.parse_expression())
+            while self.current().type == TT_COMMA:
+                self.eat(TT_COMMA)
+                args.append(self.parse_expression())
+        self.eat(TT_RPAREN)
+        return CallExpression(callee, args)
+
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: mylang parse <file>")
+        print("Usage: python3 parser.py <filename>")
         sys.exit(1)
 
     file_path = sys.argv[1]

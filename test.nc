@@ -1,4 +1,5 @@
-fn main()
-  print("Hello")
- 3 + 4 * 3 
+fn add(a, b) {
 
+    return a + b;
+}
+print(add(2, 3));
