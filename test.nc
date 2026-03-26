@@ -1,5 +1,6 @@
-fn add(a, b) {
+fn f() {
 
-    return a + b;
+  x = 5;
+  print(x);
 }
-print(add(2, 3));
+f();print(5);
