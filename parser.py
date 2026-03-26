@@ -1,5 +1,4 @@
 import sys
-import json
 from lexer import (
     Lexer,
     TT_INT,
@@ -157,8 +156,7 @@ class Parser:
             raise Exception(f"Expected token {type_}, got {token.type}")
 
     def semiHelper(self):
-        if self.current().type == TT_SEMI:
-            self.eat(TT_SEMI)
+        self.eat(TT_SEMI)
 
     def parse(self):
         statements = []
@@ -179,16 +177,22 @@ class Parser:
                 return self.parse_while()
             elif token.value == "fn":
                 return self.parse_function()
+            else:
+                raise Exception(f"Unknown keyword {token.value}")
         elif token.type == TT_IDENTIFIER:
             next_token = self.peek()
             if next_token and next_token.type == TT_EQ:
                 return self.parse_assignment()
             else:
                 expr = self.parse_expression()
+                self.semiHelper()
                 return ExpressionStatement(expr)
         elif token.type in (TT_INT, TT_FLOAT, TT_STRING, TT_LPAREN):
             expr = self.parse_expression()
             return ExpressionStatement(expr)
+        elif token.type == TT_SEMI:
+            self.eat(TT_SEMI)
+            return None
         else:
             raise Exception(f"Unknown statement starting with {token.type}")
 
@@ -235,7 +239,10 @@ class Parser:
         while self.current() and self.current().type != TT_RBRACE:
             if self.current().type == TT_EOF:
                 raise Exception("Unexpected EOF: missing }")
-            statements.append(self.parse_statement())
+            statement = self.parse_statement()
+            if statement is not None:
+                statements.append(statement)
+
         self.eat(TT_RBRACE)
         return BlockStatement(statements)
 
@@ -265,8 +272,8 @@ class Parser:
             self.eat(TT_STRING)
             return StringLiteral(token.value)
         elif token.type == TT_IDENTIFIER:
-            self.eat(TT_IDENTIFIER)
-            identifier = Identifier(token.value)
+            tokenid = self.eat(TT_IDENTIFIER)
+            identifier = Identifier(tokenid.value)
             if self.current() and self.current().type == TT_LPAREN:
                 return self.callfinish(identifier)
             return identifier
