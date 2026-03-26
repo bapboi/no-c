@@ -4,30 +4,73 @@ from lexer import Lexer
 from parser import Parser
 from compiler import Compiler
 
-if len(sys.argv) < 2:
-    print("Usage: ncc <file>")
-    sys.exit(1)
 
-file_path = sys.argv[1]
+def run_lexer(file_path):
+    with open(file_path, "r") as f:
+        source = f.read()
+    lexer = Lexer(source)
+    tokens, error = lexer.createTokens()
+    if error:
+        print(error.as_string())
+        sys.exit(1)
+    for token in tokens:
+        print(token)
 
-with open(file_path, "r") as f:
-    source = f.read()
 
-# Lexing
-lexer = Lexer(source)
-tokens, error = lexer.createTokens()
-if error:
-    print(error.as_string())
-    sys.exit(1)
+def run_parser(file_path):
+    with open(file_path, "r") as f:
+        source = f.read()
+    lexer = Lexer(source)
+    tokens, error = lexer.createTokens()
+    if error:
+        print(error.as_string())
+        sys.exit(1)
+    parser = Parser(tokens)
+    try:
+        ast = parser.parse()
+    except Exception as e:
+        print(f"Parse error: {e}")
+        sys.exit(1)
+    print(ast.to_tree())
 
-# Parsing
-parser = Parser(tokens)
-try:
-    ast = parser.parse()
-except Exception as e:
-    print(f"Parse error: {e}")
-    sys.exit(1)
 
-# Compile & run
-compiler = Compiler(ast)
-compiler.compile_and_run()
+def run_program(file_path):
+    with open(file_path, "r") as f:
+        source = f.read()
+    lexer = Lexer(source)
+    tokens, error = lexer.createTokens()
+    if error:
+        print(error.as_string())
+        sys.exit(1)
+    parser = Parser(tokens)
+    try:
+        ast = parser.parse()
+    except Exception as e:
+        print(f"Parse error: {e}")
+        sys.exit(1)
+    compiler = Compiler(ast)
+    compiler.compile_and_run()
+
+
+def main():
+    if len(sys.argv) < 3:
+        print("usage: ncc <flag> <filepath>")
+        print("flags: -l = lex, -p = parse, -r = run")
+        sys.exit(1)
+
+    flag = sys.argv[1]
+    file_path = sys.argv[2]
+
+    if flag == "-l":
+        run_lexer(file_path)
+    elif flag == "-p":
+        run_parser(file_path)
+    elif flag == "-r":
+        run_program(file_path)
+    else:
+        print(f"Unknown flag {flag}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
