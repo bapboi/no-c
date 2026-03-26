@@ -1,6 +1,5 @@
-# c but more functional
+# no-c
 
-no-c is a programming language centered around the idea of having no global namespace and more functional approach to syntax.
+c but more functional
 
-
-//TODO: rewrite lexer to not use regex, dependency on regex engine would slow in future
+//TODO: resolve None conditional comparisons, add unsupported functions to parser, cleanup parser in general
