@@ -1,15 +1,19 @@
 # no-c
 
-no-c is a functional language that intends to have no global namespace and functional features, while still adopting imperative programming standards.
+no-c is an imperative language that intends to have no global namespace and functional features, while still adopting c-like standards.
+
+no-c supports arrays and array accessing, strings as arrays, divison by zero, error checking, null types, logical and bitwise operations, cross file imports, and features assumed for most programming languages 
+
+no-c's main feature is the `module` keyword. excluding imports, everything must be defined within a `module`. modules define a singleton that can be exported using the `export` keyword to allow access to files that import it using `import`, and restricts reinstantiation. within modules, all features of the language are possible, including definition of user defined types, using the `type` keyword. `type` defines a type that can have multiple instances. 
 
 ## how to run
 
-`ncc` is a bash script that calls the lexer, parser, and compiler.
-you can either add the folder that contains it to your .bashrc or .zshrc, but i choose to run it within the local environment with `./ncc`
+linux/osx:
+`./ncc <flag> <filepath>`
+`<flag>`: one of three flags (-l, -p, -r) that either calls the lexer, the parser, or transpiles and executes the provided program, with the loader resolving file paths 
 
-the format is `ncc <flag> <filepath>`, where flag is one of three flags (-l, -p, -r) that either calls the lexer, the parser, or transpiles and executes the provided program.
-the file format is not enforced yet but planned to take .nc files.
 
 written in python.
 
-//TODO: resolve None conditional comparisons, add unsupported functions to parser, cleanup parser in general
+TODO: add support for os operations, expand built in library for basic math operations (make in no-c lawl), fix strings 
+
