@@ -31,19 +31,6 @@ def parseFile(path):
         sys.exit(1)
 
 
-def compileFile(path):
-    try:
-        ast = loadProgram(path)
-    except Exception as e:
-        print(f"error: {e}")
-        sys.exit(1)
-    try:
-        print(Compiler(ast).compileNode(ast))
-    except Exception as e:
-        print(f"compile error: {e}")
-        sys.exit(1)
-
-
 def runFile(path):
     try:
         ast = loadProgram(path)
@@ -62,7 +49,6 @@ def main():
         print("usage: ncc <flag> <filepath>")
         print("  -l   lex")
         print("  -p   parse")
-        print("  -c   compile")
         print("  -r   run")
         sys.exit(1)
 
@@ -76,8 +62,6 @@ def main():
         lexFile(path)
     elif flag == "-p":
         parseFile(path)
-    elif flag == "-c":
-        compileFile(path)
     elif flag == "-r":
         runFile(path)
     else:
