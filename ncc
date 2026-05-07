@@ -1,74 +1,87 @@
 #!/usr/bin/env python3
 import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from lexer import Lexer
 from parser import Parser
 from compiler import Compiler
+from loader import loadProgram
 
 
-def run_lexer(file_path):
-    with open(file_path, "r") as f:
-        source = f.read()
-    lexer = Lexer(source)
-    tokens, error = lexer.createTokens()
-    if error:
-        print(error.as_string())
+def lexFile(path):
+    tokens, err = Lexer(open(path).read()).createTokens()
+    if err:
+        print(err.as_string())
         sys.exit(1)
-    for token in tokens:
-        print(token)
+    for t in tokens:
+        print(t)
 
 
-def run_parser(file_path):
-    with open(file_path, "r") as f:
-        source = f.read()
-    lexer = Lexer(source)
-    tokens, error = lexer.createTokens()
-    if error:
-        print(error.as_string())
+def parseFile(path):
+    tokens, err = Lexer(open(path).read()).createTokens()
+    if err:
+        print(err.as_string())
         sys.exit(1)
-    parser = Parser(tokens)
     try:
-        ast = parser.parse()
+        print(Parser(tokens).parse().to_tree())
     except Exception as e:
-        print(f"Parse error: {e}")
+        print(f"parse error: {e}")
         sys.exit(1)
-    print(ast.to_tree())
 
 
-def run_program(file_path):
-    with open(file_path, "r") as f:
-        source = f.read()
-    lexer = Lexer(source)
-    tokens, error = lexer.createTokens()
-    if error:
-        print(error.as_string())
-        sys.exit(1)
-    parser = Parser(tokens)
+def compileFile(path):
     try:
-        ast = parser.parse()
+        ast = loadProgram(path)
     except Exception as e:
-        print(f"Parse error: {e}")
+        print(f"error: {e}")
         sys.exit(1)
-    compiler = Compiler(ast)
-    compiler.compile_and_run()
+    try:
+        print(Compiler(ast).compileNode(ast))
+    except Exception as e:
+        print(f"compile error: {e}")
+        sys.exit(1)
+
+
+def runFile(path):
+    try:
+        ast = loadProgram(path)
+    except Exception as e:
+        print(f"error: {e}")
+        sys.exit(1)
+    try:
+        Compiler(ast).compile_and_run()
+    except Exception as e:
+        print(f"error: {e}")
+        sys.exit(1)
 
 
 def main():
     if len(sys.argv) < 3:
         print("usage: ncc <flag> <filepath>")
-        print("flags: -l = lex, -p = parse, -r = run")
+        print("  -l   lex")
+        print("  -p   parse")
+        print("  -c   compile")
+        print("  -r   run")
         sys.exit(1)
 
-    flag = sys.argv[1]
-    file_path = sys.argv[2]
+    flag, path = sys.argv[1], sys.argv[2]
+
+    if not os.path.exists(path):
+        print(f"file not found: {path}")
+        sys.exit(1)
 
     if flag == "-l":
-        run_lexer(file_path)
+        lexFile(path)
     elif flag == "-p":
-        run_parser(file_path)
+        parseFile(path)
+    elif flag == "-c":
+        compileFile(path)
     elif flag == "-r":
-        run_program(file_path)
+        runFile(path)
     else:
-        print(f"Unknown flag {flag}")
+        print(f"unknown flag: {flag}")
         sys.exit(1)
 
 
