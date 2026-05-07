@@ -1,4 +1,5 @@
 import io;
+import stack;
 module main
 {
     export { main }
@@ -12,9 +13,16 @@ module main
     }
     fn void main()
     {
+        Stack s = stack.makeStack(); 
+        mut int q = 0;
+        q = io.input("enter: ");
+        io.outln(q);
         int n = 5;
-        int res = factorial(n);
-        io.out(res);
+        int j = n + q;
+        io.outln(j);
+        int res = factorial(j);
+        io.outln(2.23 - 3);
+        io.outln(res);
         io.out("\n");
     }
 }
