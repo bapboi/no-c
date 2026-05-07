@@ -90,8 +90,15 @@ class io:
         print(value, end='')
     def outln(value=''):
         print(value)
-    def inp(prompt=''):
-        return input(prompt)
+    def input(prompt=''):
+        uval = input(prompt)
+        try: 
+            return int(uval)
+        except ValueError:
+            try:
+                return float(uval)
+            except ValueError:
+                return uval
 
 def _div(a, b):
     if b == 0: raise _DivisionError('division by zero')
@@ -540,7 +547,7 @@ class Compiler:
             member = node.callee.member
 
             if obj == "io":
-                if member in ("out", "outln", "inp"):
+                if member in ("out", "outln", "input"):
                     return f"io.{member}({args})"
                 err(f"io has no member '{member}'", node.line)
 
