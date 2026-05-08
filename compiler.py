@@ -79,10 +79,7 @@ NC_TYPES = {
 
 RUNTIME = """\
 class _TypeError(Exception): pass
-class _ImmutableError(Exception): pass
-class _AccessError(Exception): pass
 class _DivisionError(Exception): pass
-class _VoidReturnError(Exception): pass
 class _RuntimeError(Exception): pass
 
 class io:
