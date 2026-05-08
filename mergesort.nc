@@ -37,7 +37,7 @@ module main
     int n2 = r - m;
     mut int[] result1 = [];
     mut int[] result2 = [];
-    for (mut int q = 0; q < n1; q++)
+    for (int q = 0; q < n1; q++)
     {
       result1[q] = arr[l + q];
     }

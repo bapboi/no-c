@@ -14,20 +14,22 @@ module main
     }
     fn void main()
     {
-        int[] k = [0, 333, 1];
         Stack s = stack.makeStack(); 
-        mut int q = 0;
-        q = io.input("enter: ");
-        io.outln(q);
+        s.push(3);
+        s.push(6);
+        s.push(5);
+        s.push(1);
+        io.out(s.pop());
+        io.outln();
+        io.out(s.peek());
+        io.outln();
         int n = 5;
-        int j = n + q;
-        io.outln(j);
-        int res = factorial(j);
-        io.outln(2.23 - 3);
+        int res = factorial(5);
         io.outln(res);
-        io.outln(k[1]);
-        io.out("\n");
-        mut string b = "aads";
-       // b[0] = "1";
+        io.outln(s.pop());
+
+    
+        io.outln(s.pop());
+        io.outln(s.pop());
     }
 }
