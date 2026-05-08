@@ -2,9 +2,9 @@
 
 import io;
 
-module main
+module linkedlist
 {
-    export { main }
+    export { LinkedList, Node, makeList}
 
     type Node
     {
@@ -111,8 +111,16 @@ module main
         {
             return this.size;
         }
+       
     }
-
+    fn LinkedList makeList()
+    {
+        return new LinkedList(null, 0);
+    }
+}
+module main
+{
+    export { main }
     fn void main()
     {
         LinkedList list = new LinkedList(null, 0);
