@@ -3,3 +3,6 @@ __pycache__/*
 
 # ds store 
 .DS_Store
+
+# archive 
+no-c.zip
