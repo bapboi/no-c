@@ -68,6 +68,26 @@ module main
             this.size = (this.size - 1);
             return val;
         }
+        fn int removeLast()
+        { 
+            if (this.head == null)
+            {
+                return -1;
+            }
+            if (this.head.getNext() == null)
+            {
+              return this.head.getValue();
+            }
+            mut Node curr = this.head;
+            while (curr.getNext().getNext() != null)
+            {
+              curr = curr.getNext();
+
+            }
+            Node res = curr.next;
+            curr.next = null; 
+            return res.getValue();
+        }
 
         fn void print()
         {
@@ -113,6 +133,10 @@ module main
         io.outln(popped);
 
         io.out("list after pop: ");
+        list.print();
+        
+        io.out(list.removeLast());
+        io.out("\n");
         list.print();
     }
 }
