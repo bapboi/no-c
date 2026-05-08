@@ -12,8 +12,10 @@ linux/osx:
 `./ncc <flag> <filepath>`
 `<flag>`: one of three flags (-l, -p, -r) that either calls the lexer, the parser, or transpiles and executes the provided program, with the loader resolving file paths 
 
+requirements: python3 (developed in python 3.14.0) path in your env
 
 written in python.
+
 
 TODO: add support for os operations, expand built in library for basic math operations (make in no-c lawl), fix strings 
 
